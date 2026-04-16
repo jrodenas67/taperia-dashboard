@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Dashboard BI Taperia",
   "main": "generate_dashboard.js",
+  "type": "module",
   "scripts": {
     "build": "node fetch_data.js && node parse_excel.js && node generate_dashboard.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
 }

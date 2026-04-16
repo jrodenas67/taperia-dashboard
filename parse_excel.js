@@ -1,68 +1,48 @@
-import fs from "fs";
+Production: main@e80600b failed
+Failed during stage 'building site': Build script returned non-zero exit code: 2
+Today at 3:38 PM
 
-const raw = JSON.parse(fs.readFileSync("data.json"));
+Production: main@e80600b failed
+Failed during stage 'building site': Build script returned non-zero exit code: 2
+Today at 3:31 PM
 
-// meses válidos
-const mesesLista = [
-  "Enero","Febrero","Marzo","Abril","Mayo","Junio",
-  "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
-];
+Production: main@e293b9f failed
+Failed during stage 'building site': Build script returned non-zero exit code: 2
+Today at 3:27 PM
 
-let facturacion = [];
+Production: main@e293b9f failed
+Failed during stage 'building site': Build script returned non-zero exit code: 2
+Today at 3:27 PM
 
-raw.forEach(row => {
-  const values = Object.values(row);
+Production: main@13528c9 failed
+Failed during stage 'building site': Build script returned non-zero exit code: 2
+Today at 3:26 PM
 
-  // detectar mes
-  const mes = values.find(v =>
-    mesesLista.includes((v || "").toString().trim())
-  );
+Production: main@eeabc6b failed
+Failed during stage 'building site': Build script returned non-zero exit code: 2
+Today at 3:23 PM
 
-  if (!mes) return;
+Production: main@cf00ed8 published
+Update package.json
+Today at 3:14 PM
+Deployed in 8s
 
-  // limpiar números
-  const numeros = values
-    .map(v => {
-      if (!v) return null;
 
-      const limpio = v.toString()
-        .replace(/[€,%\s]/g, "")
-        .replace(",", ".");
+Production: main@2f3d199 failed
+Failed during stage 'Install dependencies': dependency_installation script returned non-zero exit code: 1
+Today at 3:13 PM
 
-      const num = parseFloat(limpio);
-      return isNaN(num) ? null : num;
-    })
-    .filter(v => v !== null);
+Production: main@2f3d199 failed
+Failed during stage 'Install dependencies': dependency_installation script returned non-zero exit code: 1
+Today at 3:13 PM
 
-  if (numeros.length < 3) return;
+Production: main@ba0d6e2 failed
+Failed during stage 'Install dependencies': dependency_installation script returned non-zero exit code: 1
+Today at 3:08 PM
 
-  facturacion.push({
-    mes,
-    ingresos: numeros[2] || 0,
-    coste: numeros[3] || 0
-  });
-});
+Production: main@cc62762 failed
+Failed during stage 'Install dependencies': dependency_installation script returned non-zero exit code: 1
+Today at 3:06 PM
 
-// evitar crash si no hay datos
-if (facturacion.length === 0) {
-  console.error("❌ No se detectaron datos de facturación");
-  fs.writeFileSync("bi_data.json", JSON.stringify({
-    facturacion: [],
-    totalIngresos: 0,
-    totalCoste: 0,
-    margen: 0
-  }));
-  process.exit(0);
-}
-
-const totalIngresos = facturacion.reduce((a,b)=>a+b.ingresos,0);
-const totalCoste = facturacion.reduce((a,b)=>a+b.coste,0);
-
-fs.writeFileSync("bi_data.json", JSON.stringify({
-  facturacion,
-  totalIngresos,
-  totalCoste,
-  margen: totalIngresos - totalCoste
-}, null, 2));
-
-console.log("✅ BI data generado correctamente");
+Production: main@ebb3b68 failed
+Failed during stage 'Install dependencies': dependency_installation script returned non-zero exit code: 1

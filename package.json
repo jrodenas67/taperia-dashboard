@@ -1,7 +1,3 @@
-{
-  "name": "taperia-dashboard",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "node fetch_data.js && node generate_dashboard.js"
-  }
+"scripts": {
+  "build": "node fetch_data.js && node parse_excel.js && node generate_dashboard.js"
 }

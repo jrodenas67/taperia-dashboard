@@ -1,4 +1,7 @@
-const fs = require("fs");
+if (!process.env.GOOGLE_SHEET_URL) {
+  console.error("❌ GOOGLE_SHEET_URL no definida");
+  process.exit(1);
+}const fs = require("fs");
 const https = require("https");
 
 const SHEET_URL = process.env.GOOGLE_SHEET_URL;

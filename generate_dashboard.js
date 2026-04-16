@@ -1,9 +1,9 @@
 const fs = require("fs");
 
-// 📥 Leer datos procesados (BI)
+// 📥 Leer datos BI
 const data = JSON.parse(fs.readFileSync("bi_data.json"));
 
-// 📊 Datos para gráficos
+// 📊 Datos
 const meses = data.facturacion.map(d => d.mes);
 const ingresos = data.facturacion.map(d => d.ingresos);
 const costes = data.facturacion.map(d => d.coste);
@@ -13,21 +13,65 @@ const totalIngresos = data.totalIngresos || 0;
 const totalCoste = data.totalCoste || 0;
 const margen = data.margen || 0;
 
-// 🧠 cálculo ratio
-const ratio = totalIngresos > 0 ? (totalCoste / totalIngresos * 100).toFixed(1) : 0;
+const ratio = totalIngresos > 0
+  ? (totalCoste / totalIngresos * 100)
+  : 0;
 
-// ⚠️ alertas simples
-let alerta = "✅ Todo estable";
+// 🎨 color semáforo
+const getColor = (value) => {
+  if (value > 40) return "#ef4444";   // rojo
+  if (value > 35) return "#f59e0b";   // naranja
+  return "#22c55e";                   // verde
+};
 
+// 🧠 DIAGNÓSTICO INTELIGENTE
+let diagnostico = [];
+let recomendaciones = [];
+
+// COSTE
 if (ratio > 40) {
-  alerta = "⚠️ Coste de personal demasiado alto";
+  diagnostico.push("🔴 Coste de personal excesivo");
+  recomendaciones.push("Reducir personal en días de baja demanda (miércoles/jueves)");
+} else if (ratio > 35) {
+  diagnostico.push("🟡 Coste controlado pero mejorable");
+  recomendaciones.push("Optimizar turnos para bajar del 35%");
+} else {
+  diagnostico.push("🟢 Coste bien optimizado");
 }
 
+// INGRESOS (tendencia)
+if (ingresos.length > 2) {
+  const ultimo = ingresos[ingresos.length - 1];
+  const anterior = ingresos[ingresos.length - 2];
+
+  if (ultimo < anterior * 0.8) {
+    diagnostico.push("🔴 Caída fuerte de ingresos");
+    recomendaciones.push("Revisar eventos, clima o staffing reciente");
+  } else if (ultimo < anterior) {
+    diagnostico.push("🟡 Ligera caída de ingresos");
+    recomendaciones.push("Monitorizar próximos días");
+  } else {
+    diagnostico.push("🟢 Tendencia positiva");
+  }
+}
+
+// MARGEN
+if (margen < totalIngresos * 0.5) {
+  diagnostico.push("🟡 Margen ajustado");
+  recomendaciones.push("Revisar costes fijos y estructura");
+} else {
+  diagnostico.push("🟢 Margen saludable");
+}
+
+// ALERTA GENERAL
+let alerta = "✅ Operativa estable";
+
+if (ratio > 40) alerta = "⚠️ Coste alto";
 if (ingresos.length > 1 && ingresos[ingresos.length - 1] < ingresos[ingresos.length - 2]) {
-  alerta = "📉 Caída de ingresos reciente";
+  alerta = "📉 Bajada reciente de ingresos";
 }
 
-// 🎨 HTML
+// 📊 HTML
 const html = `
 <!DOCTYPE html>
 <html>
@@ -62,8 +106,12 @@ h1 {
 }
 
 .alert {
-  color: #f87171;
   font-weight: bold;
+  color: #f87171;
+}
+
+ul {
+  padding-left: 20px;
 }
 
 canvas {
@@ -97,15 +145,29 @@ canvas {
   </div>
 
   <div class="card">
-    <h3>⚖️ Ratio Coste</h3>
-    <h2>${ratio}%</h2>
+    <h3>⚖️ Ratio</h3>
+    <h2 style="color:${getColor(ratio)}">${ratio.toFixed(1)}%</h2>
   </div>
 
 </div>
 
 <div class="card">
-  <h3>⚠️ Alertas</h3>
+  <h3>⚠️ Estado</h3>
   <div class="alert">${alerta}</div>
+</div>
+
+<div class="card">
+  <h3>🧠 Diagnóstico</h3>
+  <ul>
+    ${diagnostico.map(d => `<li>${d}</li>`).join("")}
+  </ul>
+</div>
+
+<div class="card">
+  <h3>📋 Recomendaciones</h3>
+  <ul>
+    ${recomendaciones.map(r => `<li>${r}</li>`).join("")}
+  </ul>
 </div>
 
 <canvas id="lineChart"></canvas>
@@ -149,7 +211,7 @@ new Chart(document.getElementById('barChart'), {
 </html>
 `;
 
-// 💾 guardar archivo final
+// 💾 Guardar
 fs.writeFileSync("index.html", html);
 
-console.log("✅ Dashboard BI generado correctamente");
+console.log("✅ Dashboard BI modo consultor generado");
